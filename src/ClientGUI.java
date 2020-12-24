@@ -9,8 +9,8 @@ import javax.swing.*;
 
 public class ClientGUI extends JFrame {
 
-    JPanel container;
-    JTextArea screen, msgBox;
+    JPanel container, screen;
+    JTextArea msgBox;
     JButton submit;
     JLabel userLabel;
     Color curColorTheme;
@@ -19,11 +19,12 @@ public class ClientGUI extends JFrame {
     Socket soc;
     DataOutputStream out;
     JScrollPane scrollpane;
+    GridBagConstraints screenLayoutControl = new GridBagConstraints();
 
     public ClientGUI(String username_src) {
         username = username_src;
-            curColorTheme = RandomColorGenerator.getRandColor();
-            initGUI();
+        curColorTheme = RandomColorGenerator.getRandColor();
+        initGUI();
     }
 
     public void initGUI() {
@@ -33,7 +34,16 @@ public class ClientGUI extends JFrame {
         this.setSize(500, 750);
         this.setLayout(null);
         this.setResizable(false);
-        this.setLocationRelativeTo(null);
+        //set appropriate location
+        if (WelcomeScreen.usersLoggedIn == 1) {
+            this.setLocation(Toolkit.getDefaultToolkit().getScreenSize().width / 4 - this.getWidth() / 2,
+                    Toolkit.getDefaultToolkit().getScreenSize().height / 2 - this.getHeight() / 2);
+        } else {
+            this.setLocation(Toolkit.getDefaultToolkit().getScreenSize().width / 4
+                    + Toolkit.getDefaultToolkit().getScreenSize().width / 2 - this.getWidth() / 2,
+                    Toolkit.getDefaultToolkit().getScreenSize().height / 2 - this.getHeight() / 2);
+
+        }
         container = new JPanel();
         container.setSize(this.getSize());
         container.setBackground(curColorTheme);
@@ -49,13 +59,13 @@ public class ClientGUI extends JFrame {
         container.add(userLabel);
 
         //display screen
-        screen = new JTextArea();
-        screen.setFont(new Font("Segoe UI", Font.PLAIN, 20));
-        screen.setBorder(BorderFactory.createLineBorder(Color.white, 8));
-        screen.setEditable(false);
+        screen = new JPanel();
         screen.setSize(450, 500);
-        screen.setLocation(0, 0);
-        screen.setLineWrap(true);
+        screen.setLayout(new GridBagLayout());
+        screen.setBackground(Color.white);
+        screenLayoutControl.insets = new Insets(10, 10, 10, 10);
+        screenLayoutControl.fill = GridBagConstraints.HORIZONTAL;
+        screenLayoutControl.gridwidth = 1;
         scrollpane = new JScrollPane(screen);
         scrollpane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
         scrollpane.setSize(450, 500);
@@ -69,6 +79,7 @@ public class ClientGUI extends JFrame {
         msgBox.setSize(450, 80);
         msgBox.setLocation(15, 555);
         this.addWindowListener(new WindowAdapter() {
+            @Override
             public void windowOpened(WindowEvent e) {
                 msgBox.requestFocus();
             }

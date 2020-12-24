@@ -7,6 +7,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 public class Server {
+
     ServerSocket serverSocket;
     Socket soc1, soc2;
     DataInputStream in1, in2;
@@ -28,11 +29,9 @@ public class Server {
             out1 = new DataOutputStream(soc1.getOutputStream());
             out2 = new DataOutputStream(soc2.getOutputStream());
 
-
             Thread temp = new Thread(this::msgFromClient1);
             temp.start();
             msgFromClient2();
-
 
             in1.close();
             in2.close();
@@ -51,23 +50,26 @@ public class Server {
         while (continueFlag) {
             try {
                 String msg = in1.readUTF();
-                if (!msg.equalsIgnoreCase("quit") && msg.length() > 0)
+                if (!msg.equalsIgnoreCase("quit") && msg.length() > 0) {
                     out2.writeUTF(msg);
-                else
+                } else {
                     continueFlag = false;
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
     }
+
     public void msgFromClient2() {
         while (continueFlag) {
             try {
                 String msg = in2.readUTF();
-                if (!msg.equalsIgnoreCase("quit") && msg.length() > 0)
+                if (!msg.equalsIgnoreCase("quit") && msg.length() > 0) {
                     out1.writeUTF(msg);
-                else
+                } else {
                     continueFlag = false;
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }

@@ -7,14 +7,13 @@ import java.net.Socket;
 import java.util.Scanner;
 
 public class ClientSocket {
+
     ClientGUI ref;
     Socket socket;
     DataInputStream dataInputStream;
     DataOutputStream dataOutputStream;
     //communication vars
-    String msgOut = "";
-    String msgIn = "";
-
+    boolean continueFlag = true;
 
     public ClientSocket(ClientGUI src, String ipAdd, int port) {
         try {
@@ -39,28 +38,33 @@ public class ClientSocket {
     }
 
     public void startS2C() {
-        while(!msgOut.equalsIgnoreCase("quit") && !msgIn.equalsIgnoreCase("quit")) {
+        while (continueFlag) {
             try {
-                msgIn = dataInputStream.readUTF();
-                System.out.println(msgIn);
-                if(msgIn.length() > 0)
-                    ref.handler.recieve(msgIn);
-                msgIn = "";
+                Message msg = new Message(dataInputStream.readUTF());
+                if (msg.msg.length() > 0) {
+                    if (msg.msg.equalsIgnoreCase("quit")) {
+                        continueFlag = false;
+                    }
+
+                    ref.handler.recieve(msg.toString());
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
     }
+
     public void startC2S() {
-        while(!msgOut.equalsIgnoreCase("quit") && !msgIn.equalsIgnoreCase("quit")) {
+        while (continueFlag) {
             try {
-                if(ref.handler.doAction)
-                    msgOut = ref.handler.send();
-                
-                System.out.println(msgOut);
-                if(msgOut.length() > 0)
-                    dataOutputStream.writeUTF(ref.username + ": " + msgOut);
-                msgOut = "";
+                if (ref.handler.doAction) {
+                    Message msg = new Message(ref.handler.send());
+
+                    if (msg.msg.length() > 0) {
+                        dataOutputStream.writeUTF(msg.toString());
+                    }
+                }
+                System.out.println();
             } catch (IOException e) {
                 e.printStackTrace();
             }
